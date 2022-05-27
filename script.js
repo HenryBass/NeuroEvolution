@@ -7,7 +7,7 @@ var frame = 0;
 var running = true;
 var selected;
 
-
+var population = 0;
 
 class Entity {
   constructor(x, y, r, g, b) {
@@ -114,14 +114,19 @@ class Entity {
 
     objects.push(newAgent)
     agents.push(newAgent)
+
+    population += 1
   }
 
   rot() {
     splat(this.x, this.y, this.r / 2, this.g / 2, this.b / 2)
     objects.push(new Food(this.x, this.y))
+
+
     this.lock.attcrs.splice(this.lock.attcrs.indexOf(this), 1)
 
-    
+
+    population -= 1
     objects.splice(objects.indexOf(this), 1)
     agents.splice(agents.indexOf(this), 1)
   }
@@ -165,7 +170,7 @@ class Entity {
         if (this.lock.lock.attcrs !== undefined) {
           this.lock.lock.attcrs.splice(this.lock.lock.attcrs.indexOf(this.lock), 1);
         }
-
+        population -= 1
         this.reproduce()
 
       } else if (this.lock.type == "food") {
@@ -210,7 +215,7 @@ class Entity {
     if (this.y < 0) {
       this.y += 20;
     }
-    //this.nrg -= 1;
+    this.nrg -= 1;
 
   }
 
@@ -234,6 +239,10 @@ class Entity {
   }
 
   lockOn() {
+    if (this.lock !== undefined) {
+      this.lock.attcrs.splice(this.lock.attcrs.indexOf(this), 1)
+    }
+    
     this.lock = objects[Math.floor(Math.random() * objects.length)]
       if (this.lock == this) {
         this.lockOn()
@@ -336,6 +345,7 @@ for (i = 0; i < 100; i++) {
   let x = new Entity(r(512), r(512), r(255), r(255), r(255))
   objects.push(x)
   agents.push(x)
+  population += 1
 }
 
 for (i = 0; i < 0; i++) {
@@ -372,7 +382,7 @@ function setup() {
 
 function draw() {
 
-  //document.getElementById("pop").innerHTML = "Population: " + (agents.length) + "<br>Alive %: " + Math.round((agents.length / objects.length) * 100)
+  document.getElementById("pop").innerHTML = "Population: " + population
   frame++;
   if (running && frame % 1 == 0) {
     
